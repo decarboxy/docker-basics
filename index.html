@@ -1,0 +1,141 @@
+<<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/monokai.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>Dealing with Docker</h1>
+				</section>
+				<section>
+					<h2>Containers and VMs</h2>
+					<img width=600 data-src="images/container-vs-vm.png">
+					https://blog.docker.com/2018/08/containers-replacing-virtual-machines/
+					<ul>
+						<li>Application isolation: Containers share a kernel</li>
+						<li>Containers use kernel namespaces for isolation</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Why use containers?</h2>
+					<ul>
+						<li>Easy to deploy immutable artifacts</li>
+						<li>Test and deploy the same environment</li>
+						<li>Take advantage of redundancy and scaling features of orchestration systems like Kubernetes and Docker swarm</li>
+					</ul>
+				</section>
+				
+				<section>
+					<h2>Why not use containers?</h2>
+					<ul>
+						<li>Your existing application is a monolith and you don't have issues deploying or scaling it</li>
+						<li>Completely secure isolation of applications is critical</li>
+						<li>Your application requires huge amounts of disk or network IO</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Container internals: Isolation</h2>
+					<img width=400 data-src="images/control-groups.gif">
+					<ul>
+						<li>Kernel namespaces are used to Isolate PID, Mountpoints, Networking, Users, UTS and IPC</li>
+						<li>CGroups are used to isolate CPU and memory </li>
+					</ul>
+
+				</section>
+				
+				<section>
+					Security
+					<!--TODO: this is a weak place for me --Sam -->
+				</section>
+
+				<section>
+					<h2>Starting a docker container</h2>
+					<p>Download and run a lightweight linux container in interactive mode (-i) with a TTY (-t)</p>
+					<pre>docker run -ti alpine:latest</pre>
+					<p>Compare the processes running inside the container to the processes on your laptop</p>
+				</section>
+
+				<section>
+					<h2>Building container images</h2>
+
+					<p>create a textfile called Dockerfile with the following:</p>
+					<pre>
+FROM alpine:latest 
+RUN apk add curl
+					</pre>
+					<p>build the image and use it to start a container</p>
+					<pre>docker build -t my-new-image:latest</pre>
+					<pre>docker run -ti my-new-image:latest</pre>
+				</section>
+
+				<section>
+					<h2>Storing data persistently</h2>
+					<ul>
+						<li>Volumes -- Persistent volumes that can be mounted in the docker filesystem</li>
+						<li>Bind mounts -- "share" a directory on the host with the container</li>
+						<li>Volumes are more useful in general, bind mounts can be helpful with debugging</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Launching a container with a bind mount</h2>
+					<p>to launch a container with your home directory mounted at /host:</p>
+					<pre>docker run -it -v "$(pwd):/host alpine:latest</pre>
+				</section>
+
+				<section>
+					<h2>Creating a container and mounting it</h2>
+					<p>to create a volume and mount it at /myvol:</p>
+					<pre>docker volume create my-vol</pre>
+					<pre>docker run -it -mount source=myvol2,target=/myvol</pre>
+					<p>volumes persist across container restarts</p>
+				</section>
+
+				<section>
+					<h2>Networking</h2>
+					
+				</section>
+			</div>
+		</div>
+
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>
+>
