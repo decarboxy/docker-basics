@@ -31,28 +31,29 @@
 				<section>
 					<h2>Containers and VMs</h2>
 					<img width=600 data-src="images/container-vs-vm.png">
-					https://blog.docker.com/2018/08/containers-replacing-virtual-machines/
 					<ul>
 						<li>Application isolation: Containers share a kernel</li>
 						<li>Containers use kernel namespaces for isolation</li>
 					</ul>
+					<p><small>https://blog.docker.com/2018/08/containers-replacing-virtual-machines/</small>
 				</section>
 
 				<section>
 					<h2>Why use containers?</h2>
 					<ul>
-						<li>Easy to deploy immutable artifacts</li>
-						<li>Test and deploy the same environment</li>
-						<li>Take advantage of redundancy and scaling features of orchestration systems like Kubernetes and Docker swarm</li>
+						<li>Immutable artifacts and ephemeral instances</li>
+						<li>It works on my machine</li>
+						<li>Horizontal scaling</li>
 					</ul>
 				</section>
 				
 				<section>
 					<h2>Why not use containers?</h2>
 					<ul>
-						<li>Your existing application is a monolith and you don't have issues deploying or scaling it</li>
-						<li>Completely secure isolation of applications is critical</li>
-						<li>Your application requires huge amounts of disk or network IO</li>
+						<li>Your application does not run on Linux</li>
+						<li>Tightly integrated with the hardware or GUI</li>
+						<li>Need kernel level isolation</li>
+						<li>Need bare metal performance</li>
 					</ul>
 				</section>
 
@@ -67,59 +68,66 @@
 				</section>
 				
 				<section>
-					Security
-					<!--TODO: this is a weak place for me --Sam -->
+					<h2>Security</h2>
+					<ul>
+						<li>Capabilities: What root can do
+						<li>SecComp: Syscalls
+						<li>Linux Security Module: AppArmor / SELinux
+					</ul>
 				</section>
 
 				<section>
 					<h2>Starting a docker container</h2>
 					<p>Download and run a lightweight linux container in interactive mode (-i) with a TTY (-t)</p>
-					<pre>docker run -ti alpine:latest</pre>
+					<pre>docker run -it alpine:latest</pre>
 					<p>Compare the processes running inside the container to the processes on your laptop</p>
 				</section>
 
 				<section>
 					<h2>Building container images</h2>
 
-					<p>create a textfile called Dockerfile with the following:</p>
+					<p>Create a textfile called Dockerfile with the following:</p>
 					<pre>
 FROM alpine:latest 
 RUN apk add curl
 					</pre>
-					<p>build the image and use it to start a container</p>
-					<pre>docker build -t my-new-image:latest</pre>
-					<pre>docker run -ti my-new-image:latest</pre>
+					<p>Build the image and use it to start a container</p>
+					<pre>docker build -t my-new-image:latest .</pre>
+					<pre>docker run -it my-new-image:latest</pre>
 				</section>
 
 				<section>
-					<h2>Storing data persistently</h2>
+					<h2>Volumes: Persistent Data</h2>
 					<ul>
-						<li>Volumes -- Persistent volumes that can be mounted in the docker filesystem</li>
-						<li>Bind mounts -- "share" a directory on the host with the container</li>
-						<li>Volumes are more useful in general, bind mounts can be helpful with debugging</li>
+						<li>Named: Local data managed by docker</li>
+						<li>Host: map a host directory into the container</li>
+						<li>Anonymous: Random unique id</li>
+						<li>Host volumes are useful for dev and conf files</li>
+						<li>All volumes are bind mounts by default</li>
+						<li>Named volume opts go to the mount syscall</li>
 					</ul>
 				</section>
 
 				<section>
 					<h2>Launching a container with a bind mount</h2>
 					<p>to launch a container with your home directory mounted at /host:</p>
-					<pre>docker run -it -v "$(pwd):/host alpine:latest</pre>
+					<pre>docker run -it -v "$(pwd):/host" alpine:latest</pre>
 				</section>
 
 				<section>
 					<h2>Creating a container and mounting it</h2>
 					<p>to create a volume and mount it at /myvol:</p>
 					<pre>docker volume create my-vol</pre>
-					<pre>docker run -it -mount source=myvol2,target=/myvol</pre>
-					<p>volumes persist across container restarts</p>
+					<pre>docker run -it -mount source=myvol2,target=/myvol alpine:latest</pre>
+					<p>volumes persist across container instances</p>
 				</section>
 
 				<section>
 					<h2>Networking</h2>
 					<ul>
-						<li>Bridge network -- A software bridge allowing containers to interact. The default</li>
-						<li>Host network -- Use the network of the docker host without isolation</li>
-						<li>Overlay network -- Use a software overlay to connect multiple docker daemons</li>
+						<li>Bridge network: A virtual networking switch in Linux (default)</li>
+						<li>Host network: Use the network of the docker host without isolation</li>
+						<li>Overlay network: Span a bridge network across multiple hosts</li>
 					</ul>
 				</section>
 			</div>
